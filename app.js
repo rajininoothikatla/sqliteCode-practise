@@ -19,7 +19,7 @@ const initializeDBAndServer = async () => {
       console.log('Server is running at http://localhost:3000/')
     })
   } catch (e) {
-    console.log('DB Error: ${e.message}')
+    console.log(`DB Error: ${e.message}`)
     process.exit(1)
   }
 }
@@ -90,7 +90,7 @@ app.put(`/movies/:movieId/`, async (request, response) => {
     movie_name ='${movieName}',
     lead_actor = '${leadActor}'
   WHERE 
-    movie_id = ${movieId}`
+    movie_id = ${movieId};`
   await db.run(updateMovieQuery)
   response.send('Movie Details Updated')
 })
@@ -127,16 +127,9 @@ app.get(`/directors/`, async (request, response) => {
 app.get(`/directors/:directorId/movies/`, async (request, response) => {
   const {directorId} = request.params
   const getDirectorIdQuery = `
-    SELECT 
-      director_id 
-    FROM 
-      movie
-    WHERE director_id = ${directorId};`
-  const getDirectorIdQueryResponse = await db.get(getDirectorIdQuery)
-  const getMovieNameQuery = `
   SELECT movie_name AS moviName FROM movie
-  WHERE movie_id = ${getDirectorIdQueryResponse.movie_id}`
-  const getMovieNameQueryResponse = await db.get(getMovieNameQuery)
+  WHERE director_id = ${directorId};`
+  const getMovieNameQueryResponse = await db.all(getMovieNameQuery)
   response.send(getMovieNameQueryResponse)
 })
 module.exports = app
